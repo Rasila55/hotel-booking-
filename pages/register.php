@@ -1,64 +1,77 @@
-<?php 
+<?php
 require_once('../includes/db.php');
 
-//checking if the form is submitted
-if($_SERVER["REQUEST_METHOD"]=="POST"){
+session_start(); // Start session to store user info if needed
+
+if($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $name = trim($_POST['name']);
     $email = trim($_POST['email']);
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
 
-    //validating the form inputs
+    // Validate inputs
     if(empty($name) || empty($email) || empty($password) || empty($confirm_password)){
-        echo "All fields are required.";
+        $_SESSION['error'] = "All fields are required.";
+        header("Location: ../index.php"); // redirect back to registration page
         exit();
     }
 
-    //validating email format
+    // Validate email
     if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
-        echo "Invalid email format.";
+        $_SESSION['error'] = "Invalid email format.";
+        header("Location: ../index.php");
         exit();
     }
 
-    //checking if password and confirm password match
+    // Check password match
     if($password !== $confirm_password){
-        echo "Passwords do not match.";
+        $_SESSION['error'] = "Passwords do not match.";
+        header("Location: ../index.php");
         exit();
     }
 
-    //hashing the password
+    // Hash password
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-    //checking if the email is already registered
+    // Check if email exists
     $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $stmt->store_result();
 
     if($stmt->num_rows > 0){
-        echo "Email is already registered.";
+        $_SESSION['error'] = "Email is already registered.";
+        $stmt->close();
+         header("Location: ../pages/user_dashboard.php");
         exit();
     }
 
-    //Inserting the new user into the database
-    $role = "user"; // default role
 
+    // Insert new user
+    $role = "user"; // default role
     $stmt = $conn->prepare("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)");
     $stmt->bind_param("ssss", $name, $email, $hashed_password, $role);
 
-    if($stmt->execute()){
-        echo "Registration successful.";
+   if($stmt->execute()){
+    $_SESSION['success'] = "Registration successful.";
+
+    // Set login session automatically after registration
+    $_SESSION['user_id'] = $stmt->insert_id;
+    $_SESSION['name'] = $name;
+    $_SESSION['role'] = $role;
+
+    // Redirect
+    if($role === 'admin'){
+        header("Location: ../admin/admin_dashboard.php");
     } else {
-        echo "Error: " . $stmt->error;
+        header("Location: ../pages/user_dashboard.php");
     }
+    exit();
+}
+
 
     $stmt->close();
     $conn->close();
 }
-
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 ?>
