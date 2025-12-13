@@ -1,0 +1,11 @@
+RewriteEngine On
+RewriteBase /staymate/admin/
+
+# Prevent direct access to pages folder
+RewriteCond %{REQUEST_URI} ^/staymate/admin/pages/
+RewriteRule ^(.*)$ /staymate/admin/index.php [L,R=302]
+
+# Route all requests to index.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
