@@ -1,68 +1,54 @@
 <?php 
 session_start();
-?>
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-</head>
-<body>
-
-<h2>Login</h2>
-
-<form action="login.php" method="POST">
-    <input type="email" name="email" placeholder="Email" required><br><br>
-    <input type="password" name="password" placeholder="Password" required><br><br>
-    <button type="submit">Login</button>
-</form>
-
-<p>Don't have an account? <a href="register.php">Register here</a></p>
-
-<?php
 require_once '../includes/db.php';
 
 if($_SERVER["REQUEST_METHOD"] == "POST"){
     
     $email = trim($_POST['email']);
     $password = trim($_POST['password']);
-
+    
     if(empty($email) || empty($password)){
-        echo "All fields are required.";
+        $_SESSION['error'] = "All fields are required.";
+        header("Location: login.php");
         exit();
     }
-
+    
     $stmt = $conn->prepare("SELECT id, name, email, password, role FROM users WHERE email = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $result = $stmt->get_result();
-
+    
     if($result->num_rows == 0){
-        echo "Email not registered.";
+        $_SESSION['error'] = "Email not registered.";
+        $stmt->close();
+        header("Location: login.php");
         exit();
     }
-
+    
     $user = $result->fetch_assoc();
-
+    
     if(!password_verify($password, $user['password'])){
-        echo "Incorrect password.";
+        $_SESSION['error'] = "Incorrect password.";
+        $stmt->close();
+        header("Location: login.php");
         exit();
     }
-
+    
+    // Set session variables
     $_SESSION['user_id'] = $user['id'];
     $_SESSION['name'] = $user['name'];
     $_SESSION['role'] = $user['role'];
-
+    $_SESSION['logged_in'] = true;
+    
+    $stmt->close();
+    $conn->close();
+    
+    // Redirect based on role
     if($user['role'] === 'admin'){
         header("Location: ../admin/admin_dashboard.php");
         exit();
     } else {
-        header("Location: ../pages/user_dashboard.php");
+        header("Location: ../index.php"); // Changed from staymate/index.php
         exit();
     }
 }
-?>
-</body>
-</html>
