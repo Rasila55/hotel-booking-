@@ -13,12 +13,18 @@ include 'includes/sidebar.php';
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
         <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
             <h3>Total Users</h3>
-            <p style="font-size: 32px; margin-top: 10px;">150</p>
+            <p style="font-size: 32px; margin-top: 10px;">
+                <?php
+                $user_count = readAll('users');
+                echo count($user_count);
+                ?>
+            </p>
         </div>
         
         <div class="card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;">
             <h3>Active Sessions</h3>
-            <p style="font-size: 32px; margin-top: 10px;">45</p>
+            <p style="font-size: 32px; margin-top: 10px;">
+                
         </div>
         
         <div class="card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white;">

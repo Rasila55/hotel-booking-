@@ -1,12 +1,21 @@
 <?php
+// START SESSION FIRST - This must be the very first line!
 session_start();
 
-require_once('db.php');
+// Include database connection
+require_once '../includes/db.php';
+
+
+// CHECK IF USER IS LOGGED IN
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+    $_SESSION['booking_message'] = "Please login or register to make a booking";
+    $_SESSION['booking_message_type'] = 'warning';
+    header('Location: ../index.php');
+    exit();
+}
 
 // Check if form is submitted
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    
-    // $conn = getConnection();
     
     // Get form data
     $check_in = mysqli_real_escape_string($conn, trim($_POST['checkin']));
@@ -43,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (count($errors) > 0) {
         $_SESSION['booking_message'] = implode(', ', $errors);
         $_SESSION['booking_message_type'] = 'danger';
-        header('Location: index.php');
+        header('Location: ../index.php');
         exit();
     }
     
@@ -52,9 +61,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
     // Get total guests
     $total_guests = $adults + $children;
-    
-    // Find available room that matches capacity
-    $available_room_query = "
+
+
+
+// ===== ADD THIS DEBUG CODE =====
+echo "<h3>Debug Info:</h3>";
+echo "Check-in: $check_in<br>";
+echo "Check-out: $check_out<br>";
+echo "Adults: $adults<br>";
+echo "Children: $children<br>";
+echo "Total guests: " . ($adults + $children) . "<br><br>";
+
+
+// Find available room that matches capacity
+        $available_room_query = "
         SELECT r.id, r.room_number, r.room_type, r.price, r.capacity 
         FROM rooms r
         WHERE r.status = 'available' 
@@ -62,22 +82,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         AND r.id NOT IN (
             SELECT room_id 
             FROM bookings 
-            WHERE status != 'cancelled' 
-            AND (
-                (check_in <= '$check_out' AND check_out >= '$check_in')
+            WHERE (status = 'pending' OR status = 'confirmed')
+            AND NOT (
+                check_out <= '$check_in' OR check_in >= '$check_out'
             )
         )
         ORDER BY r.price ASC
         LIMIT 1
-    ";
-    
+        "; 
     $result = mysqli_query($conn, $available_room_query);
     
+    // Check if rooms available
     if (!$result || mysqli_num_rows($result) == 0) {
         $_SESSION['booking_message'] = "Sorry, no rooms available for selected dates and number of guests";
         $_SESSION['booking_message_type'] = 'warning';
         mysqli_close($conn);
-        header('Location: index.php');
+        header('Location: ../index.php'); // Fixed: redirect to homepage, not confirmation
         exit();
     }
     
@@ -89,8 +109,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Calculate total price
     $total_price = $nights * $room_price;
     
-    // Get user_id from session (if logged in)
-    $user_id = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 'NULL';
+    // Get user_id from session (we know user is logged in now)
+    $user_id = $_SESSION['user_id'];
     
     // Insert booking
     $insert_query = "
@@ -103,11 +123,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (mysqli_query($conn, $insert_query)) {
         $booking_id = mysqli_insert_id($conn);
         
-        // Store booking details in session
-        $_SESSION['booking_message'] = "Booking successful! Room {$room['room_number']} ({$room['room_type']}) reserved for $nights night(s). Total: $" . number_format($total_price, 2);
-        $_SESSION['booking_message_type'] = 'success';
-        
-        $_SESSION['last_bookings'] = array(
+        // Store booking details in session for confirmation page
+        $_SESSION['last_booking'] = array(
             'booking_id' => $booking_id,
             'room_id' => $room_id,
             'room_number' => $room['room_number'],
@@ -120,17 +137,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             'price_per_night' => $room_price,
             'total_price' => $total_price
         );
+        
+        mysqli_close($conn);
+        // Redirect to confirmation page
+        header('Location: booking_confirmation.php');
+        exit();
+        
     } else {
+        // Booking insert failed
         $_SESSION['booking_message'] = "Error creating booking: " . mysqli_error($conn);
         $_SESSION['booking_message_type'] = 'danger';
+        mysqli_close($conn);
+        header('Location: ../index.php');
+        exit();
     }
     
-    mysqli_close($conn);
-    header('Location: index.php');
-    exit();
-    
 } else {
-    header('Location: index.php');
+    // Not a POST request
+    header('Location: ../index.php');
     exit();
 }
 ?>

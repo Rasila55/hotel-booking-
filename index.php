@@ -1,3 +1,7 @@
+<?php
+session_start(); 
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,6 +19,8 @@
         }
     </style>
 </head>
+
+
 
 <?php
 if (isset($_SESSION['booking_message'])) {
@@ -70,7 +76,7 @@ if (isset($_SESSION['booking_message'])) {
 <div class="modal fade" id="LoginModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog">
             <div class="modal-content">
-               <form action="../pages/login.php" method="POST" >
+                <form action="./pages/login.php" method="POST">
                      <div class="modal-header">
                         <h5 class="modal-title d-flex align-items-center" >
                          <i class="bi bi-person fs-3 me-2"></i> User Login
@@ -193,7 +199,8 @@ if (isset($_SESSION['booking_message'])) {
     <div class="row">
         <div class="col-lg-12 bg-white shadow p-4 rounded">
             <h5 class="mb-4">Checking Booking Availability</h5>
-            <form method="POST" action="booking.php">
+                <form action="./pages/booking.php" method="POST">
+
                 <div class="row align-items-end">
                     <div class="col-lg-3 mb-3">
                         <label class="form-label" style="font-weight:500;">Check-in</label>

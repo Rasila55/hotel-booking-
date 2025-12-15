@@ -65,7 +65,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
         $conn->close();
         
         // Redirect to index.php in staymate folder
-        header("Location: ../index.php");
+        header("Location: my_bookings.php");
         exit();
     } else {
         $_SESSION['error'] = "Registration failed: " . $stmt->error;

@@ -11,5 +11,9 @@ if($conn->connect_error){
 
 }
 
-
+function getDBConnection()
+{
+    global $conn;
+    return $conn;
+}
 ?>

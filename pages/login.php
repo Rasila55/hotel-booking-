@@ -48,7 +48,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         header("Location: ../admin/admin_dashboard.php");
         exit();
     } else {
-        header("Location: ../index.php"); // Changed from staymate/index.php
+        header("Location: my_bookings.php"); 
         exit();
     }
 }

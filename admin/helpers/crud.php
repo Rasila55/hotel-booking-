@@ -1,5 +1,6 @@
 <?php
-require_once 'config.php';
+require_once __DIR__ . '/../../includes/db.php';
+
 
 /**
  * CRUD Helper Functions
@@ -65,7 +66,9 @@ function create($table, $data) {
  * @return array - Array of records
  */
 function readAll($table, $conditions = [], $orderBy = '', $limit = null) {
+    require_once __DIR__ . '/../../includes/db.php';
     $conn = getDBConnection();
+
     
     $sql = "SELECT * FROM $table";
     $types = '';

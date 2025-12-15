@@ -3,7 +3,8 @@ session_start();
 
 define('BASE_PATH', '/staymate/admin');
 
-require_once 'helpers/config.php';
+require_once '../includes/db.php';
+
 require_once 'helpers/crud.php';
 
 $url = isset($_GET['url']) ? $_GET['url'] : 'dashboard';
