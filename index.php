@@ -10,13 +10,77 @@ session_start();
     <title>Staymate</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <style>
+     <style>
         *{
-            font-family: "poppins", sans-serif;
+            font-family: "Poppins", sans-serif;
         }
         .h-font{
-            font-family: "merienda", cursive;
+            font-family: "Merienda", cursive;
+
         }
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+        
+
+      .swiper-container img {
+        width: 100%;
+        height: 50vh;     /* image takes only half of the screen height */
+        object-fit: cover;
+        }
+
+        /* Medium laptops */
+        @media (max-width: 1400px) {
+        .swiper-container img {
+        height: 50vh;
+        }
+        }
+
+        /* Tablets */
+        @media (max-width: 992px) {
+        .swiper-container img {
+        height: 40vh;
+        }
+        }
+
+        /* Mobile */
+        @media (max-width: 576px) {
+        .swiper-container img {
+        height: 30vh;
+        }
+    }
+        .btn-custom{
+    background-color: #2ec1ac;
+    color: #fff;
+    border: none;
+}
+
+.btn-custom:hover{
+    background-color: #279e8c;
+    color: #fff;
+}
+                    .availability-form{
+                margin-top: -30px;
+                position: relative;
+                z-index: 10;
+            }
+
+         @media screen and (max-width: 576px) {
+            .availability-form{
+            margin-top:25px;
+            padding: 0 35px;
+            
+            }
+
+         }
+
+
     </style>
 </head>
 
@@ -37,42 +101,7 @@ if (isset($_SESSION['booking_message'])) {
 <!-- Sabina's code -->
  <?php include('includes/header.php'); ?>
  <body class = "bg-light">
-    <nav class="navbar navbar-expand-lg navbar-light bg-white px-lg-2 shadow-sm sticky-top">
-        <div class="container-fluid">
-            <a class="navbar-brand me- fw-bold fs-3 h-font" href="index.php">StayMate</a>
-            <button class="navbar-toggler shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                         <a class="nav-link active me-2" aria-current="page" href="#">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link me-2" href="#">Rooms</a>
-                    </li>
-                    <li class="nav-item">
-                         <a class="nav-link me-2" href="#">Facilities</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link me-2" href="#">Contact us</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link me-2" href="#">About</a>
-                    </li>
-                </ul>
-                 <div class="d-flex">
-                    <button type="button" class="btn btn-outline-dark shadow-none me-lg-3 me-2" data-bs-toggle="modal" data-bs-target="#LoginModal">
-                            Login 
-                    </button>
-                    <button type="button" class="btn btn-outline-dark shadow-none " data-bs-toggle="modal" data-bs-target="#registerModal">
-                            Register
-                    </button>
-
-                 </div>
-            </div>
-        </div>
-    </nav>
+   
 <div class="modal fade" id="LoginModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog">
             <div class="modal-content">
@@ -230,7 +259,8 @@ if (isset($_SESSION['booking_message'])) {
                         </select>
                     </div>
                     <div class="col-lg-1 mb-lg-3 mt-2">
-                        <button type="submit" class="btn text-white shadow-none custom-bg">Submit</button>
+                         <button type="submit" class="btn btn-primary shadow-none">Submit</button>
+
                     </div>
                 </div>
             </form>
