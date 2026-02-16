@@ -1,5 +1,6 @@
 <?php
-session_start(); 
+session_start();
+require_once 'includes/db.php'; 
 ?>
 
 <!DOCTYPE html>
@@ -269,27 +270,44 @@ if (isset($_SESSION['booking_message'])) {
 </div>
 
 
-<!-- Our Rooms -->
+
  
+
+?>
+<!-- Our Rooms -->
 <h2 class="mt-5 pt-4 mb-4 text-center fw-bold h-font">OUR ROOMS</h2>
 <div class="container">
     <div class="row">
+        <?php
+        $sql = "SELECT * FROM rooms WHERE status='available' LIMIT 3";
+        $result = mysqli_query($conn, $sql);
+        while($room = mysqli_fetch_assoc($result)):
+        ?>
         <div class="col-lg-4 col-md-6 my-3">
-            <div class="card border-0 shadow" style="max-width: 350px; margin: auto;">
-                <img src="images/rooms/room1.png" class="card-img-top" >
+            <div class="card border-0 shadow" style="max-width:350px; margin:auto;">
+                <img src="images/rooms/room1.png" class="card-img-top" style="height:200px; object-fit:cover;">
                 <div class="card-body">
-                    <h5>Simple Room Name</h5>
-                    
-                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card’s content.</p>
-                    <a href="#" class="btn btn-primary">Go somewhere</a>
+                    <h5><?php echo htmlspecialchars($room['room_type']); ?> Room</h5>
+                    <p class="fw-bold">Rs. <?php echo number_format($room['price']); ?>/night</p>
+                    <p class="card-text"><?php echo $room['description'] ?? 'Comfortable and modern room.'; ?></p>
+                    <a href="/staymate/pages/rooms.php" class="btn btn-custom">Book Now</a>
                 </div>
             </div>
         </div>
-        <div class="col-lg-12 text-center mt-5">
-            <a href="#" class="btn btn-sm btn-outline-dark rounded-0 fw-bold shadow-none">More Rooms >>></a>
+        <?php endwhile; ?>
+
+        <div class="col-12 text-center mt-4">
+            <a href="/staymate/pages/rooms.php" 
+               class="btn btn-sm btn-outline-dark rounded-0 fw-bold shadow-none">
+                More Rooms >>>
+            </a>
         </div>
     </div>
 </div>
+
+<br><br><br>
+
+
 
 <br><br><br>
 <br><br><br>
@@ -299,3 +317,4 @@ if (isset($_SESSION['booking_message'])) {
 <?php include('includes/footer.php'); ?>
 </body>
 </html>
+

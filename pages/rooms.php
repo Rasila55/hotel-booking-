@@ -1,363 +1,106 @@
 <?php
 session_start();
-require_once __DIR__ . '/admin/helpers/config.php';
-require_once __DIR__ . '/admin/helpers/crud.php';
-     
-include '../includes/header.php';              
-include '../includes/footer.php';             
+require_once '../includes/db.php';
 
 $page_title = "Rooms";
 
-// ── FILTERS from GET 
-$checkin     = isset($_GET['checkin'])  ? $_GET['checkin']  : '';
-$checkout    = isset($_GET['checkout']) ? $_GET['checkout'] : '';
-$adults      = isset($_GET['adults'])   ? (int)$_GET['adults']   : 0;
-$children    = isset($_GET['children']) ? (int)$_GET['children'] : 0;
-$facilities  = isset($_GET['facilities']) && is_array($_GET['facilities'])
-               ? $_GET['facilities'] : [];
+// FILTERS
+$checkin    = isset($_GET['checkin'])   ? $_GET['checkin']   : '';
+$checkout   = isset($_GET['checkout'])  ? $_GET['checkout']  : '';
+$adults     = isset($_GET['adults'])    ? (int)$_GET['adults']   : 0;
+$children   = isset($_GET['children'])  ? (int)$_GET['children'] : 0;
+$facilities = isset($_GET['facilities']) && is_array($_GET['facilities'])
+              ? $_GET['facilities'] : [];
 
-// ── FETCH ROOMS 
-$conn = getDBConnection();
+// BUILD SQL using $conn from db.php
+$where = "WHERE r.status = 'available'";
 
-$where  = "WHERE r.status = 'available'";
-$params = [];
-$types  = '';
-
-// Filter by adults
 if ($adults > 0) {
-    $where   .= " AND r.max_adults >= ?";
-    $params[] = $adults;
-    $types   .= 'i';
+    $where .= " AND r.max_adults >= " . (int)$adults;
 }
-
-// Filter by children
 if ($children > 0) {
-    $where   .= " AND r.max_children >= ?";
-    $params[] = $children;
-    $types   .= 'i';
+    $where .= " AND r.max_children >= " . (int)$children;
+}
+foreach ($facilities as $fac) {
+    $fac    = mysqli_real_escape_string($conn, $fac);
+    $where .= " AND FIND_IN_SET('$fac', REPLACE(r.facilities, ', ', ','))";
 }
 
-// Filter by facilities
-foreach ($facilities as $facility) {
-    $where   .= " AND FIND_IN_SET(?, REPLACE(r.facilities, ', ', ','))";
-    $params[] = $facility;
-    $types   .= 's';
+$sql    = "SELECT r.*, h.name AS hotel_name, h.location AS hotel_location
+           FROM rooms r
+           LEFT JOIN hotels h ON r.hotel_id = h.id
+           $where
+           ORDER BY r.price ASC";
+
+$result = mysqli_query($conn, $sql);
+$rooms  = [];
+while ($row = mysqli_fetch_assoc($result)) {
+    $rooms[] = $row;
 }
 
-$sql = "SELECT r.*, h.name AS hotel_name, h.location AS hotel_location
-        FROM rooms r
-        LEFT JOIN hotels h ON r.hotel_id = h.id
-        $where
-        ORDER BY r.id ASC";
-
-// Run query
-$stmt = $conn->prepare($sql);
-if (!empty($params)) {
-    $stmt->bind_param($types, ...$params);
-}
-$stmt->execute();
-$rooms = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-$stmt->close();
-
-// ALL POSSIBLE FACILITIES (for filter sidebar) 
 $allFacilities = ['Wifi', 'Air conditioner', 'Television', 'Spa', 'Room Heater', 'Geyser'];
 
-include __DIR__ . '/includes/header.php';
+// HEADER comes AFTER data is fetched
+include '../includes/header.php';
 ?>
 
 <style>
-    /*  PAGE TITLE  */
-    .page-title-section {
-        text-align: center;
-        padding: 40px 0 30px;
-    }
-
+    .page-title-section { text-align:center; padding:40px 0 30px; }
     .page-title-section h1 {
-        font-size: 32px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        font-family: Georgia, serif;
-        position: relative;
-        display: inline-block;
+        font-size:32px; font-weight:700; text-transform:uppercase;
+        letter-spacing:2px; font-family:Georgia,serif; display:inline-block;
     }
-
     .page-title-section h1::after {
-        content: '';
-        display: block;
-        width: 60%;
-        height: 2px;
-        background: #333;
-        margin: 8px auto 0;
+        content:''; display:block; width:60%; height:2px;
+        background:#333; margin:8px auto 0;
     }
+    .rooms-layout { display:flex; gap:24px; padding:0 40px 60px; align-items:flex-start; }
 
-    /* ── LAYOUT ── */
-    .rooms-layout {
-        display: flex;
-        gap: 24px;
-        padding: 0 40px 60px;
-        align-items: flex-start;
-    }
-
-    /* ── FILTER SIDEBAR ── */
     .filter-sidebar {
-        width: 240px;
-        min-width: 240px;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        padding: 20px;
-        background: #fff;
-        position: sticky;
-        top: 20px;
+        width:240px; min-width:240px; border:1px solid #ddd;
+        border-radius:6px; padding:20px; background:#fff; position:sticky; top:20px;
     }
-
-    .filter-sidebar h6 {
-        font-size: 13px;
-        font-weight: 700;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-        margin-bottom: 14px;
-        color: #222;
-    }
-
-    .filter-section {
-        margin-bottom: 24px;
-        border-bottom: 1px solid #eee;
-        padding-bottom: 20px;
-    }
-
-    .filter-section:last-child {
-        border-bottom: none;
-        margin-bottom: 0;
-    }
-
-    .filter-section label {
-        font-size: 13px;
-        color: #444;
-        display: block;
-        margin-bottom: 5px;
-    }
-
+    .filter-sidebar h6 { font-size:13px; font-weight:700; letter-spacing:1px; text-transform:uppercase; margin-bottom:14px; color:#222; }
+    .filter-section { margin-bottom:20px; border-bottom:1px solid #eee; padding-bottom:18px; }
+    .filter-section:last-child { border-bottom:none; margin-bottom:0; }
+    .filter-section label { font-size:13px; color:#444; display:block; margin-bottom:4px; }
     .filter-section input[type="date"],
-    .filter-section input[type="number"] {
-        width: 100%;
-        padding: 7px 10px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        font-size: 13px;
-        margin-bottom: 10px;
-    }
+    .filter-section input[type="number"] { width:100%; padding:7px 10px; border:1px solid #ccc; border-radius:4px; font-size:13px; margin-bottom:10px; }
+    .guests-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .btn-filter { width:100%; padding:9px; background:#1aab8a; color:#fff; border:none; border-radius:4px; font-size:14px; cursor:pointer; margin-top:16px; }
+    .btn-filter:hover { background:#158a6e; }
+    .btn-reset { width:100%; padding:9px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; font-size:14px; margin-top:8px; text-align:center; text-decoration:none; display:block; }
+    .btn-reset:hover { background:#f5f5f5; }
 
-    .filter-section .form-check {
-        margin-bottom: 6px;
-    }
-
-    .filter-section .form-check-label {
-        font-size: 13px;
-        color: #444;
-    }
-
-    .guests-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-    }
-
-    .btn-filter {
-        width: 100%;
-        padding: 9px;
-        background: #1aab8a;
-        color: #fff;
-        border: none;
-        border-radius: 4px;
-        font-size: 14px;
-        cursor: pointer;
-        margin-top: 16px;
-        transition: background 0.2s;
-    }
-
-    .btn-filter:hover { background: #158a6e; }
-
-    .btn-reset {
-        width: 100%;
-        padding: 9px;
-        background: transparent;
-        color: #555;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        font-size: 14px;
-        cursor: pointer;
-        margin-top: 8px;
-        text-align: center;
-        text-decoration: none;
-        display: block;
-        transition: all 0.2s;
-    }
-
-    .btn-reset:hover { background: #f5f5f5; color: #333; }
-
-    /* ── ROOM CARDS ── */
-    .rooms-list {
-        flex: 1;
-    }
-
-    .room-card {
-        display: flex;
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        overflow: hidden;
-        margin-bottom: 20px;
-        background: #fff;
-        transition: box-shadow 0.2s;
-    }
-
-    .room-card:hover {
-        box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-    }
-
-    .room-card-img {
-        width: 280px;
-        min-width: 280px;
-        height: 220px;
-        object-fit: cover;
-    }
-
-    .room-card-img-placeholder {
-        width: 280px;
-        min-width: 280px;
-        height: 220px;
-        background: #f0f0f0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #aaa;
-        font-size: 40px;
-    }
-
-    .room-card-body {
-        padding: 20px;
-        flex: 1;
-    }
-
-    .room-card-body h5 {
-        font-size: 18px;
-        font-weight: 600;
-        margin-bottom: 12px;
-        color: #222;
-    }
-
-    .tag-label {
-        font-size: 12px;
-        font-weight: 600;
-        color: #444;
-        margin-bottom: 5px;
-        margin-top: 10px;
-    }
-
-    .tag {
-        display: inline-block;
-        background: #f0f0f0;
-        color: #444;
-        font-size: 12px;
-        padding: 3px 10px;
-        border-radius: 3px;
-        margin: 2px 3px 2px 0;
-    }
-
-    .guest-tag {
-        display: inline-block;
-        background: #f0f0f0;
-        color: #444;
-        font-size: 12px;
-        padding: 3px 10px;
-        border-radius: 3px;
-        margin: 2px 3px 2px 0;
-    }
-
-    /* ── PRICE + ACTIONS ── */
-    .room-card-actions {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: flex-end;
-        padding: 20px;
-        min-width: 160px;
-        border-left: 1px solid #f0f0f0;
-    }
-
-    .room-price {
-        font-size: 15px;
-        font-weight: 600;
-        color: #222;
-        margin-bottom: 14px;
-        white-space: nowrap;
-    }
-
-    .btn-book {
-        display: block;
-        width: 130px;
-        text-align: center;
-        padding: 9px 0;
-        background: #1aab8a;
-        color: #fff;
-        border: none;
-        border-radius: 4px;
-        font-size: 14px;
-        text-decoration: none;
-        margin-bottom: 8px;
-        transition: background 0.2s;
-    }
-
-    .btn-book:hover { background: #158a6e; color: #fff; }
-
-    .btn-details {
-        display: block;
-        width: 130px;
-        text-align: center;
-        padding: 8px 0;
-        background: transparent;
-        color: #333;
-        border: 1.5px solid #ccc;
-        border-radius: 4px;
-        font-size: 14px;
-        text-decoration: none;
-        transition: all 0.2s;
-    }
-
-    .btn-details:hover {
-        background: #f5f5f5;
-        color: #333;
-        border-color: #aaa;
-    }
-
-    /*  NO RESULTS  */
-    .no-results {
-        text-align: center;
-        padding: 60px 20px;
-        color: #999;
-    }
-
-    .no-results i {
-        font-size: 48px;
-        display: block;
-        margin-bottom: 12px;
-    }
+    .rooms-list { flex:1; }
+    .room-card { display:flex; border:1px solid #e0e0e0; border-radius:8px; overflow:hidden; margin-bottom:20px; background:#fff; transition:box-shadow 0.2s; }
+    .room-card:hover { box-shadow:0 4px 16px rgba(0,0,0,0.1); }
+    .room-card-img { width:280px; min-width:280px; height:220px; object-fit:cover; }
+    .room-card-img-placeholder { width:280px; min-width:280px; height:220px; background:#f0f0f0; display:flex; align-items:center; justify-content:center; font-size:48px; color:#aaa; }
+    .room-card-body { padding:20px; flex:1; }
+    .room-card-body h5 { font-size:18px; font-weight:600; margin-bottom:12px; color:#222; }
+    .tag-label { font-size:12px; font-weight:600; color:#444; margin:10px 0 5px; }
+    .tag { display:inline-block; background:#f0f0f0; color:#444; font-size:12px; padding:3px 10px; border-radius:3px; margin:2px 3px 2px 0; }
+    .room-card-actions { display:flex; flex-direction:column; justify-content:center; align-items:center; padding:20px; min-width:160px; border-left:1px solid #f0f0f0; gap:8px; }
+    .room-price { font-size:15px; font-weight:600; color:#222; text-align:center; margin-bottom:6px; }
+    .btn-book { display:block; width:130px; text-align:center; padding:9px 0; background:#1aab8a; color:#fff !important; border-radius:4px; font-size:14px; text-decoration:none; }
+    .btn-book:hover { background:#158a6e; }
+    .btn-details { display:block; width:130px; text-align:center; padding:8px 0; background:transparent; color:#333 !important; border:1.5px solid #ccc; border-radius:4px; font-size:14px; text-decoration:none; }
+    .btn-details:hover { background:#f5f5f5; }
+    .no-results { text-align:center; padding:60px; color:#999; }
 </style>
 
-<!-- PAGE TITLE -->
 <div class="page-title-section">
     <h1>Our Rooms</h1>
 </div>
 
 <div class="rooms-layout">
 
-    <!-- ── FILTER SIDEBAR ── -->
+    <!-- SIDEBAR -->
     <div class="filter-sidebar">
         <h6>Filters</h6>
-
         <form method="GET" action="">
 
-            <!-- Check Availability -->
             <div class="filter-section">
                 <h6>Check Availability</h6>
                 <label>Check-in</label>
@@ -366,14 +109,12 @@ include __DIR__ . '/includes/header.php';
                 <input type="date" name="checkout" value="<?php echo htmlspecialchars($checkout); ?>">
             </div>
 
-            <!-- Facilities -->
             <div class="filter-section">
                 <h6>Facilities</h6>
                 <?php foreach ($allFacilities as $facility): ?>
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox"
-                               name="facilities[]"
-                               value="<?php echo $facility; ?>"
+                               name="facilities[]" value="<?php echo $facility; ?>"
                                id="fac_<?php echo str_replace(' ', '_', $facility); ?>"
                                <?php echo in_array($facility, $facilities) ? 'checked' : ''; ?>>
                         <label class="form-check-label" for="fac_<?php echo str_replace(' ', '_', $facility); ?>">
@@ -383,7 +124,6 @@ include __DIR__ . '/includes/header.php';
                 <?php endforeach; ?>
             </div>
 
-            <!-- Guests -->
             <div class="filter-section">
                 <h6>Guests</h6>
                 <div class="guests-row">
@@ -399,51 +139,45 @@ include __DIR__ . '/includes/header.php';
             </div>
 
             <button type="submit" class="btn-filter">Apply Filters</button>
-            <a href="rooms.php" class="btn-reset">Reset</a>
+            <a href="/staymate/pages/rooms.php" class="btn-reset">Reset</a>
 
         </form>
     </div>
 
-    <!-- ── ROOM CARDS ── -->
+    <!-- ROOMS -->
     <div class="rooms-list">
         <?php if (empty($rooms)): ?>
             <div class="no-results">
-                <i class="bi bi-search"></i>
-                <p>No rooms found matching your filters.</p>
-                <a href="rooms.php" style="color:#1aab8a;">Clear filters</a>
+                <p style="font-size:48px;">🔍</p>
+                <p>No rooms found. Try different filters.</p>
+                <a href="/staymate/pages/rooms.php" style="color:#1aab8a;">Clear filters</a>
             </div>
         <?php else: ?>
-            <?php foreach ($rooms as $room): ?>
-
-                <?php
-                // Parse comma-separated fields safely
-                $features   = !empty($room['features'])   ? array_map('trim', explode(',', $room['features']))   : [];
-                $facList    = !empty($room['facilities'])  ? array_map('trim', explode(',', $room['facilities'])) : [];
-                ?>
-
+            <?php foreach ($rooms as $room):
+                $features = !empty($room['features']) ? array_map('trim', explode(',', $room['features'])) : [];
+                $facList  = !empty($room['facilities']) ? array_map('trim', explode(',', $room['facilities'])) : [];
+            ?>
                 <div class="room-card">
 
-                    <!-- Image -->
                     <?php if (!empty($room['image'])): ?>
-                        <img src="/staymate/images/rooms/room1.png<?php echo htmlspecialchars($room['image']); ?>"
+                        <!-- <img src="/staymate/images/rooms<?php echo htmlspecialchars($room['image']); ?>"
                              alt="<?php echo htmlspecialchars($room['room_type']); ?>"
-                             class="room-card-img">
+                             class="room-card-img"> -->
+                             <img src="/staymate/images/rooms/room1.png" 
+     alt="Room Image"
+     class="room-card-img">
                     <?php else: ?>
-                        <div class="room-card-img-placeholder">
-                            <i class="bi bi-image"></i>
-                        </div>
+                        <div class="room-card-img-placeholder">🛏️</div>
                     <?php endif; ?>
 
-                    <!-- Body -->
                     <div class="room-card-body">
                         <h5>
                             <?php echo htmlspecialchars($room['room_type']); ?> Room
-                            <small style="font-size:12px; color:#999; font-weight:400;">
+                            <small style="font-size:12px;color:#999;font-weight:400;">
                                 — <?php echo htmlspecialchars($room['hotel_name']); ?>
                             </small>
                         </h5>
 
-                        <!-- Features -->
                         <?php if (!empty($features)): ?>
                             <div class="tag-label">Features</div>
                             <?php foreach ($features as $f): ?>
@@ -451,7 +185,6 @@ include __DIR__ . '/includes/header.php';
                             <?php endforeach; ?>
                         <?php endif; ?>
 
-                        <!-- Facilities -->
                         <?php if (!empty($facList)): ?>
                             <div class="tag-label">Facilities</div>
                             <?php foreach ($facList as $f): ?>
@@ -459,35 +192,32 @@ include __DIR__ . '/includes/header.php';
                             <?php endforeach; ?>
                         <?php endif; ?>
 
-                        <!-- Guests -->
                         <div class="tag-label">Guests</div>
-                        <span class="guest-tag"><?php echo $room['max_adults']; ?> Adults</span>
-                        <span class="guest-tag"><?php echo $room['max_children']; ?> Children</span>
+                        <span class="tag"><?php echo $room['max_adults']; ?> Adults</span>
+                        <span class="tag"><?php echo $room['max_children']; ?> Children</span>
                     </div>
 
-                    <!-- Actions -->
                     <div class="room-card-actions">
                         <div class="room-price">
-                            ₹<?php echo number_format($room['price']); ?> per night
+                            Rs. <?php echo number_format($room['price']); ?> per night
                         </div>
-                        <a href="<?php echo isset($_SESSION['user_id'])
-                            ? '/staymate/pages/booking.php?room_id=' . $room['id']
-                            : '/staymate/pages/login.php?redirect=booking&room_id=' . $room['id']; ?>"
-                           class="btn-book">
-                            Book Now
-                        </a>
+
+                        <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true): ?>
+                            <a href="/staymate/pages/booking.php?room_id=<?php echo $room['id']; ?><?php echo $checkin ? '&checkin='.$checkin : ''; ?><?php echo $checkout ? '&checkout='.$checkout : ''; ?>&adults=<?php echo $adults ?: 1; ?>&children=<?php echo $children; ?>"
+                               class="btn-book">Book Now</a>
+                        <?php else: ?>
+                            <a href="/staymate/pages/login.php" class="btn-book">Book Now</a>
+                        <?php endif; ?>
+
                         <a href="/staymate/pages/room-detail.php?id=<?php echo $room['id']; ?>"
-                           class="btn-details">
-                            More details
-                        </a>
+                           class="btn-details">More details</a>
                     </div>
 
                 </div>
-
             <?php endforeach; ?>
         <?php endif; ?>
     </div>
 
 </div>
 
-<?php include __DIR__ . '/includes/footer.php'; ?>
+<?php include '../includes/footer.php'; ?>
