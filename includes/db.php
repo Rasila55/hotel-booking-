@@ -3,7 +3,7 @@ $host = 'localhost';
 $username = 'root';
 $password = '' ;
 $database = 'staymate';
-$port = 3307;
+$port = 3306;
 $conn = mysqli_connect($host, $username,$password, $database, $port);
 
 if($conn->connect_error){

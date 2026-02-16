@@ -1,0 +1,112 @@
+
+        *{
+            font-family: "Poppins", sans-serif;
+        }
+        .h-font{
+            font-family: "Merienda", cursive;
+
+        }
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+      .swiper-container img {
+        width: 100%;
+        height: 50vh;     /* image takes only half of the screen height */
+        object-fit: cover;
+        }
+
+        /* Medium laptops */
+        @media (max-width: 1400px) {
+        .swiper-container img {
+        height: 50vh;
+        }
+        }
+
+        /* Tablets */
+        @media (max-width: 992px) {
+        .swiper-container img {
+        height: 40vh;
+        }
+        }
+
+        /* Mobile */
+        @media (max-width: 576px) {
+        .swiper-container img {
+        height: 30vh;
+        }
+        }
+        .custom-bg{
+            background-color: #2ec1ac;
+        }
+        .custom-bg:hover{
+            background-color: #279e8c;
+        }
+        .availability-form{
+            margin-top:-50px;
+            z-index: 2;
+            position: relative;
+        }
+         @media screen and (max-width: 576px) {
+            .availability-form{
+            margin-top:25px;
+            padding: 0 35px;
+            
+            }
+
+         }
+        
+        * {
+            font-family: "Poppins", sans-serif;
+        }
+        .h-font {
+            font-family: "Merienda", cursive;
+        }
+    :root{
+  --teal: #2ec1ac;
+  --teal_hover: #279e8c;
+}
+
+*{
+  font-family: 'Poppins', sans-serif;
+}
+.h-font{
+  font-family: 'Merienda', cursive;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+.custom-bg{
+  background-color: var(--teal);
+  border: 1px solid var(--teal);
+}
+.custom-bg:hover{
+  background-color: var(--teal_hover);
+  border-color: var(--teal_hover);
+}
+
+.h-line{
+  width: 150px;
+  margin: 0 auto;
+  height: 1.7px;
+}
+
+.custom-alert{
+  position: fixed;
+  top: 80px;
+  right: 25px;
+  z-index: 1111;
+}
