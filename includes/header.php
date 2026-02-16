@@ -119,16 +119,16 @@ $user_role = $is_logged_in ? $_SESSION['role'] : '';
                     <a class="nav-link active me-2" aria-current="page" href="index.php">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link me-2" href="#">Rooms</a>
+                    <a class="nav-link me-2" href="pages/rooms.php">Rooms</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link me-2" href="#">Facilities</a>
+                    <a class="nav-link me-2" href="pages/facilities.php">Facilities</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link me-2" href="#">Contact us</a>
+                    <a class="nav-link me-2" href="pages/contact_us.php">Contact us</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link me-2" href="#">About</a>
+                    <a class="nav-link me-2" href="pages/about.php">About</a>
                 </li>
             </ul>
             
