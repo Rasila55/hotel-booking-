@@ -146,7 +146,7 @@ include '../includes/header.php';
 
                     <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true): ?>
                         <!-- LOGGED IN: go to booking form -->
-                        <a href="/staymate/pages/booking_form.php?room_id=<?php echo $room['id']; ?><?php echo $checkin ? '&checkin='.$checkin : ''; ?><?php echo $checkout ? '&checkout='.$checkout : ''; ?>"
+                        <a href="/staymate/pages/booking.php?room_id=<?php echo $room['id']; ?><?php echo $checkin ? '&checkin='.$checkin : ''; ?><?php echo $checkout ? '&checkout='.$checkout : ''; ?>"
                            class="btn-book">Book Now</a>
                     <?php else: ?>
                         <!-- NOT LOGGED IN: go to login -->

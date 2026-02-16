@@ -120,9 +120,7 @@ $user_role = $is_logged_in ? $_SESSION['role'] : '';
                 <li class="nav-item">
                     <a class="nav-link me-2" href="/staymate/pages/rooms.php">Rooms</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link me-2" href="/staymate/pages/facilities.php">Facilities</a>
-                </li>
+              
                 <li class="nav-item">
                     <a class="nav-link me-2" href="/staymate/pages/contact_us.php">Contact us</a>
                 </li>
