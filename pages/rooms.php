@@ -29,7 +29,7 @@ include '../includes/header.php';
 
 <style>
     .page-title-section { text-align:center; padding:40px 0 30px; }
-    .page-title-section h1 { font-size:32px; font-weight:700; text-transform:uppercase; letter-spacing:2px; font-family:Georgia,serif; display:inline-block; }
+    .page-title-section h1 { font-size:32px; font-weight:700; text-transform:uppercase; letter-spacing:2px; font-family:'Merienda', cursive; display:inline-block; }
     .page-title-section h1::after { content:''; display:block; width:60%; height:2px; background:#333; margin:8px auto 0; }
     .rooms-layout { display:flex; gap:24px; padding:0 40px 60px; align-items:flex-start; }
     .filter-sidebar { width:240px; min-width:240px; border:1px solid #ddd; border-radius:6px; padding:20px; background:#fff; position:sticky; top:20px; }
