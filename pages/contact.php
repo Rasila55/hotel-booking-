@@ -143,23 +143,34 @@
   </div>
 
   <?php 
-    if(isset($_POST['send']))
-    {
-      $frm_data = filteration($_POST);
+   
+if(isset($_POST['send']))
+{
+  // DB connection
+  $conn = new mysqli("localhost", "root", "", "staymate", 3307); // change db name if different
+  
+  if($conn->connect_error){
+    die("Connection failed: " . $conn->connect_error);
+  }
 
-      $q = "INSERT INTO `user_queries`(`name`, `email`, `subject`, `message`) VALUES (?,?,?,?)";
-      $values = [$frm_data['name'],$frm_data['email'],$frm_data['subject'],$frm_data['message']];
+  $name    = htmlspecialchars(trim($_POST['name']));
+  $email   = htmlspecialchars(trim($_POST['email']));
+  $subject = htmlspecialchars(trim($_POST['subject']));
+  $message = htmlspecialchars(trim($_POST['message']));
 
-      $res = insert($q,$values,'ssss');
-      if($res==1){
-        alert('success','Mail sent!');
-      }
-      else{
-        alert('error','Server Down! Try again later.');
-      }
-    }
-  ?>
+  $stmt = $conn->prepare("INSERT INTO `user_queries`(`name`, `email`, `subject`, `message`) VALUES (?,?,?,?)");
+  $stmt->bind_param("ssss", $name, $email, $subject, $message);
 
+  if($stmt->execute()){
+    echo "<script>alert('Message sent successfully!')</script>";
+  } else {
+    echo "<script>alert('Error! Try again later.')</script>";
+  }
+
+  $stmt->close();
+  $conn->close();
+}
+?>
   <?php require('../includes/footer.php'); ?>
 
 </body>

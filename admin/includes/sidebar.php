@@ -44,10 +44,14 @@
   <a href="http://localhost/staymate" target="_blank" rel="noopener noreferrer">
     Visit Website
   </a>
-</li>
+</li>  
+ 
+    
 
         <li><a href="<?php echo BASE_PATH; ?>/dashboard" class="<?php echo ($url === 'dashboard') ? 'active' : ''; ?>">Dashboard</a></li>
-                <li><a href="<?php echo BASE_PATH; ?>/hotels" class="<?php echo ($url === 'hotels') ? 'active' : ''; ?>">Hotels</a></li>
+                        <li><a href="<?php echo BASE_PATH; ?>/bookings" class="<?php echo ($url === 'bookings') ? 'active' : ''; ?>">Bookings</a></li>
+    <li><a href="<?php echo BASE_PATH; ?>/contacts" class="<?php echo ($url === 'contacts') ? 'active' : ''; ?>">Contact</a></li>
+        <li><a href="<?php echo BASE_PATH; ?>/hotels" class="<?php echo ($url === 'hotels') ? 'active' : ''; ?>">Hotels</a></li>
                 <li><a href="<?php echo BASE_PATH; ?>/rooms" class="<?php echo ($url === 'rooms') ? 'active' : ''; ?>">Rooms</a></li>
 
                  

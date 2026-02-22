@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $allimage = explode(',', $existingimage);
     }
     $allimage = array_merge($allimage, $uploadedimage);
-    $imagetring = implode(',', $allimage);
+    $imageString = implode(',', $allimage);
     
     $data = [
         'name' => $name,
@@ -378,9 +378,7 @@ include 'includes/sidebar.php';
                                             <img src="<?php echo BASE_PATH; ?>/uploads/hotels/<?php echo $image; ?>" 
                                                  alt="<?php echo htmlspecialchars($hotel['name']); ?>">
                                         <?php endfor; ?>
-                                        <?php if (count($image) > 3): ?>
-                                            <span style="font-size: 12px; color: #666;">+<?php echo count($image) - 3; ?> more</span>
-                                        <?php endif; ?>
+                                        
                                     </div>
                                 <?php else: ?>
                                     <span style="color: #999;">No image</span>
