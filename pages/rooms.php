@@ -159,4 +159,63 @@ include '../includes/header.php';
     </div>
 </div>
 
+
+
+<!-- Our Rooms - DYNAMIC FROM DATABASE -->
+<h2 class="mt-5 pt-4 mb-4 text-center fw-bold h-font">OUR ROOMS</h2>
+<div class="container">
+    <div class="row">
+        <?php
+        require_once 'includes/db.php';
+        $sql = "SELECT r.*, h.name AS hotel_name 
+                FROM rooms r 
+                LEFT JOIN hotels h ON r.hotel_id = h.id 
+                WHERE r.status = 'available' 
+                ORDER BY r.price ASC 
+                LIMIT 3";
+        $result = mysqli_query($conn, $sql);
+        
+        if (mysqli_num_rows($result) > 0):
+            while($room = mysqli_fetch_assoc($result)):
+        ?>
+        <div class="col-lg-4 col-md-6 my-3">
+            <div class="card border-0 shadow" style="max-width:350px; margin:auto;">
+                <img src="images/rooms/room1.png" class="card-img-top" style="height:200px; object-fit:cover;">
+                <div class="card-body">
+                    <h5><?php echo htmlspecialchars($room['room_type']); ?> Room</h5>
+                    <p class="fw-bold text-success">Rs. <?php echo number_format($room['price']); ?>/night</p>
+                    
+                    <?php if(!empty($room['features'])): 
+                        $features = array_map('trim', explode(',', $room['features']));
+                    ?>
+                    <p class="mb-1"><small class="fw-bold">Features</small></p>
+                    <?php foreach($features as $f): ?>
+                        <span class="badge bg-light text-dark border me-1 mb-1"><?php echo $f; ?></span>
+                    <?php endforeach; ?>
+                    <?php endif; ?>
+                    
+                    <div class="mt-3">
+                        <a href="/staymate/pages/rooms.php" class="btn btn-custom btn-sm">View Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <?php 
+            endwhile;
+        else:
+        ?>
+        <div class="col-12 text-center py-5">
+            <p class="text-muted">No rooms available at the moment.</p>
+        </div>
+        <?php endif; ?>
+        
+        <div class="col-lg-12 text-center mt-4">
+            <a href="/staymate/pages/rooms.php" 
+               class="btn btn-sm btn-outline-dark rounded-0 fw-bold shadow-none">
+                More Rooms >>>
+            </a>
+        </div>
+    </div>
+</div>
+
 <?php include '../includes/footer.php'; ?>
