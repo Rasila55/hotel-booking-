@@ -2,6 +2,7 @@
 $page_title = "Dashboard";
 include 'includes/header.php';
 include 'includes/sidebar.php';
+
 ?>
 
 <div class="main-content">
