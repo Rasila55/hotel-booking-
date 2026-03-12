@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../../includes/db.php';
 
-
+ 
 /**
  * CRUD Helper Functions
  * Simple and secure database operations using prepared statements

@@ -185,7 +185,7 @@ include '../includes/header.php';
         <!-- Active hotel filter banner -->
         <?php if ($filtered_hotel_name): ?>
         <div class="active-filter-bar">
-            <span>🏨 Showing rooms for: <strong><?php echo htmlspecialchars($filtered_hotel_name); ?></strong></span>
+            <span> Showing rooms for: <strong><?php echo htmlspecialchars($filtered_hotel_name); ?></strong></span>
             <a href="/staymate/pages/rooms.php">✕ Clear hotel filter</a>
         </div>
         <?php endif; ?>
@@ -199,7 +199,7 @@ include '../includes/header.php';
 
         <?php if (empty($rooms)): ?>
             <div class="no-results">
-                <p style="font-size:48px;">🔍</p>
+                <p style="font-size:48px;"></p>
                 <p>No rooms found. Try different filters.</p>
                 <a href="/staymate/pages/rooms.php" style="color:#1aab8a;">Clear all filters</a>
             </div>
@@ -210,12 +210,12 @@ include '../includes/header.php';
             ?>
             <div class="room-card">
 
-                <?php if (!empty($room['image'])): ?>
-                    <img src="/staymate/admin/uploads/rooms/<?php echo htmlspecialchars($room['image']); ?>"
-                         alt="Room" class="room-card-img">
-                <?php else: ?>
-                    <img src="/staymate/images/rooms/room1.png" alt="Room" class="room-card-img">
-                <?php endif; ?>
+               <?php if (!empty($room['image']) && file_exists($_SERVER['DOCUMENT_ROOT'] . '/staymate/admin/uploads/rooms/' . $room['image'])): ?>
+    <img src="/staymate/admin/uploads/rooms/<?php echo htmlspecialchars($room['image']); ?>" 
+         alt="Room" class="room-card-img">
+<?php else: ?>
+    <img src="/staymate/images/rooms/room1.png" alt="Room" class="room-card-img">
+<?php endif; ?>
 
                 <div class="room-card-body">
                     <h5>
@@ -243,8 +243,8 @@ include '../includes/header.php';
                     <?php endif; ?>
 
                     <div class="tag-label">Guests</div>
-                    <span class="tag">👤 <?php echo $room['max_adults']; ?> Adults</span>
-                    <span class="tag">🧒 <?php echo $room['max_children']; ?> Children</span>
+                    <span class="tag"> <?php echo $room['max_adults']; ?> Adults</span>
+                    <span class="tag"> <?php echo $room['max_children']; ?> Children</span>
                 </div>
 
                 <div class="room-card-actions">
