@@ -2,12 +2,9 @@
 require_once __DIR__ . '/../../includes/db.php';
 
  
-/**
- * CRUD Helper Functions
- * Simple and secure database operations using prepared statements
- */
 
-// ==================== CREATE ====================
+
+//  CREATE 
 
 /**
  * Insert a new record into database
@@ -199,7 +196,7 @@ function query($query, $params = [], $types = '') {
     return $records;
 }
 
-// ==================== UPDATE ====================
+//  UPDATE 
 
 /**
  * Update record(s) in database

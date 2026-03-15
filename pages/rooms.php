@@ -55,7 +55,7 @@ include '../includes/header.php';
 
     .rooms-layout { display:flex; gap:24px; padding:0 40px 60px; align-items:flex-start; }
 
-    /* ── Sidebar ── */
+    /* Sidebar  */
     .filter-sidebar { width:240px; min-width:240px; border:1px solid #ddd; border-radius:6px; padding:20px; background:#fff; position:sticky; top:20px; }
     .filter-sidebar h6 { font-size:13px; font-weight:700; letter-spacing:1px; text-transform:uppercase; margin-bottom:14px; color:#222; }
     .filter-section { margin-bottom:20px; border-bottom:1px solid #eee; padding-bottom:18px; }
@@ -70,7 +70,7 @@ include '../includes/header.php';
     .btn-reset { width:100%; padding:9px; background:transparent; color:#555; border:1px solid #ccc; border-radius:4px; font-size:14px; margin-top:8px; text-align:center; text-decoration:none; display:block; }
     .btn-reset:hover { background:#f5f5f5; color:#333; }
 
-    /* ── Active filter banner ── */
+    /*  Active filter banner */
     .active-filter-bar {
         background:#e6f7f2; border:1px solid #b2dfdb; border-radius:6px;
         padding:10px 16px; margin-bottom:16px; font-size:13px; color:#1aab8a;

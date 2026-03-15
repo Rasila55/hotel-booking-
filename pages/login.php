@@ -57,7 +57,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     exit();
 }
-// If GET — show the login form below
 ?>
 <!DOCTYPE html>
 <html lang="en">

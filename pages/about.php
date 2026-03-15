@@ -1,27 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StayMate - About Us</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <style>
-        * { font-family: "Poppins", sans-serif; }
-        .h-font { font-family: "Merienda", cursive; }
-        .h-line { width: 60px; height: 3px; margin: 10px auto; }
-        .box { border-top: 4px solid #1aab8a !important; transition: transform 0.2s; }
-        .box:hover { transform: translateY(-5px); }
-        .stat-number { font-size: 28px; font-weight: 700; color: #1aab8a; }
-    </style>
-</head>
-<body class="bg-light">
-
 <?php
+
 session_start();
 require_once '../includes/db.php';
+
 include '../includes/header.php';
 ?>
+
+<style>
+    .h-font      { font-family: "Merienda", cursive; }
+    .h-line      { width: 60px; height: 3px; margin: 10px auto; }
+    .box         { border-top: 4px solid #1aab8a !important; transition: transform 0.2s; }
+    .box:hover   { transform: translateY(-5px); }
+    .stat-number { font-size: 28px; font-weight: 700; color: #1aab8a; }
+</style>
 
 <!-- Page Title -->
 <div class="my-5 px-4">
@@ -33,7 +24,7 @@ include '../includes/header.php';
     </p>
 </div>
 
-<!-- About Section -->
+<!-- Who We Are -->
 <div class="container mb-5">
     <div class="row justify-content-between align-items-center">
         <div class="col-lg-6 col-md-6 mb-4">
@@ -55,7 +46,7 @@ include '../includes/header.php';
         <div class="col-lg-5 col-md-6 mb-4">
             <img src="/staymate/images/rooms/room1.png"
                  class="w-100 rounded shadow"
-                 style="max-height:320px; object-fit:cover;">
+                 style="max-height:320px; object-fit:cover;" alt="About StayMate">
         </div>
     </div>
 </div>
@@ -128,7 +119,3 @@ include '../includes/header.php';
 </div>
 
 <?php include '../includes/footer.php'; ?>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
