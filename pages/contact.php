@@ -1,10 +1,13 @@
 <?php
+// ── MUST be first — before any output ──
 session_start();
 require_once '../includes/db.php';
- 
-include '../includes/header.php';
-?>
-<?php
+
+// ══════════════════════════════════════
+// POST HANDLER — MUST be here at top
+// BEFORE include header.php
+// BEFORE any HTML output
+// ══════════════════════════════════════
 if (isset($_POST['send'])) {
 
     $name    = htmlspecialchars(trim($_POST['name']));
@@ -23,45 +26,28 @@ if (isset($_POST['send'])) {
 
     $stmt->close();
 
-    // Redirect to prevent form resubmission on refresh
+    // Redirect MUST happen before any HTML — that's why POST handler is at top
     header('Location: /staymate/pages/contact.php');
     exit();
 }
 
+// ── Now include header — opens DOCTYPE, html, head, body, navbar ──
+include '../includes/header.php';
 ?>
 
 <style>
     .h-font  { font-family: "Merienda", cursive; }
     .h-line  { width: 60px; height: 3px; margin: 10px auto; }
-
-    .custom-bg {
-        background: #1aab8a !important; border: none;
-        font-weight: 600; transition: all 0.3s;
-    }
-    .custom-bg:hover {
-        background: #158a6e !important;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 8px rgba(26,171,138,0.3);
-    }
-
+    .custom-bg { background: #1aab8a !important; border: none; font-weight: 600; transition: all 0.3s; }
+    .custom-bg:hover { background: #158a6e !important; transform: translateY(-1px); box-shadow: 0 4px 8px rgba(26,171,138,0.3); }
     .contact-info h5 { font-weight: 600; color: #222; margin-bottom: 12px; }
     .contact-info a  { transition: color 0.2s; }
     .contact-info a:hover { color: #1aab8a !important; }
-
     .social-links a { transition: all 0.2s; }
     .social-links a:hover { color: #1aab8a !important; transform: translateY(-2px); }
-
-    .form-control:focus {
-        border-color: #1aab8a;
-        box-shadow: 0 0 0 0.2rem rgba(26,171,138,0.15);
-    }
-
+    .form-control:focus { border-color: #1aab8a; box-shadow: 0 0 0 0.2rem rgba(26,171,138,0.15); }
     .info-card { transition: transform 0.2s; }
     .info-card:hover { transform: translateY(-3px); }
-
-    .alert { padding: 12px 20px; border-radius: 6px; margin-bottom: 0; font-size: 14px; }
-    .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-    .alert-danger  { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
 </style>
 
 <!-- Page Title -->
@@ -74,7 +60,7 @@ if (isset($_POST['send'])) {
     </p>
 </div>
 
-<!--  Success / Error messages  -->
+<!-- Success / Error messages -->
 <?php if (isset($_SESSION['contact_success'])): ?>
     <div class="container mb-4">
         <div class="alert alert-success d-flex align-items-center gap-2">
@@ -100,7 +86,6 @@ if (isset($_POST['send'])) {
         <!-- Left — Contact Info -->
         <div class="col-lg-6 col-md-6 mb-5 px-4">
             <div class="bg-white rounded shadow p-4 contact-info info-card">
-
                 <h5>Address</h5>
                 <a href="https://maps.google.com" target="_blank"
                    class="d-inline-block text-decoration-none text-dark mb-2">
@@ -125,7 +110,6 @@ if (isset($_POST['send'])) {
                     <a href="#" class="text-dark fs-4"><i class="bi bi-facebook"></i></a>
                     <a href="#" class="text-dark fs-4"><i class="bi bi-instagram"></i></a>
                 </div>
-
             </div>
         </div>
 
@@ -136,28 +120,25 @@ if (isset($_POST['send'])) {
                     <h5 class="fw-bold mb-3">Send a message</h5>
 
                     <div class="mt-3">
-                        <label class="form-label fw-500">Name</label>
+                        <label class="form-label fw-semibold">Name</label>
                         <input name="name" required type="text"
                                class="form-control shadow-none"
                                placeholder="Your full name">
                     </div>
-
                     <div class="mt-3">
-                        <label class="form-label fw-500">Email</label>
+                        <label class="form-label fw-semibold">Email</label>
                         <input name="email" required type="email"
                                class="form-control shadow-none"
                                placeholder="your@email.com">
                     </div>
-
                     <div class="mt-3">
-                        <label class="form-label fw-500">Subject</label>
+                        <label class="form-label fw-semibold">Subject</label>
                         <input name="subject" required type="text"
                                class="form-control shadow-none"
                                placeholder="What is this about?">
                     </div>
-
                     <div class="mt-3">
-                        <label class="form-label fw-500">Message</label>
+                        <label class="form-label fw-semibold">Message</label>
                         <textarea name="message" required
                                   class="form-control shadow-none"
                                   rows="5" style="resize:none;"
