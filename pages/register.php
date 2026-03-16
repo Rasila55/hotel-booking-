@@ -1,6 +1,7 @@
 <?php
-require_once('../includes/db.php');
+// session_start MUST be first
 session_start();
+require_once '../includes/db.php';
 
 // If already logged in redirect
 if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
@@ -21,19 +22,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if (empty($name) || empty($email) || empty($password) || empty($confirm_password)) {
         $_SESSION['error'] = "All fields are required.";
-        header("Location: register.php"); exit();
+        header("Location: /staymate/pages/register.php"); exit();
     }
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $_SESSION['error'] = "Invalid email format.";
-        header("Location: register.php"); exit();
+        header("Location: /staymate/pages/register.php"); exit();
     }
     if ($password !== $confirm_password) {
         $_SESSION['error'] = "Passwords do not match.";
-        header("Location: register.php"); exit();
+        header("Location: /staymate/pages/register.php"); exit();
+    }
+    if (strlen($password) < 6) {
+        $_SESSION['error'] = "Password must be at least 6 characters.";
+        header("Location: /staymate/pages/register.php"); exit();
     }
 
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
+    // Check if email already exists
     $check_stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
     $check_stmt->bind_param("s", $email);
     $check_stmt->execute();
@@ -41,29 +47,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($check_stmt->num_rows > 0) {
         $_SESSION['error'] = "Email is already registered.";
         $check_stmt->close();
-        header("Location: register.php"); exit();
+        header("Location: /staymate/pages/register.php"); exit();
     }
     $check_stmt->close();
 
+    // Insert user
     $role = "user";
     $stmt = $conn->prepare("INSERT INTO users (name, email, phone, address, pincode, dob, password, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("ssssssss", $name, $email, $phone, $address, $pincode, $dob, $hashed_password, $role);
 
     if ($stmt->execute()) {
-        $_SESSION['user_id']  = $conn->insert_id;
-        $_SESSION['name']     = $name;
-        $_SESSION['role']     = "user";
+        $_SESSION['user_id']   = $conn->insert_id;
+        $_SESSION['name']      = $name;
+        $_SESSION['role']      = "user";
         $_SESSION['logged_in'] = true;
-        $_SESSION['success']  = "Registration successful! Welcome to StayMate.";
+        $_SESSION['success']   = "Registration successful! Welcome to StayMate.";
         $stmt->close();
         header("Location: /staymate/pages/my_bookings.php"); exit();
     } else {
         $_SESSION['error'] = "Registration failed. Please try again.";
         $stmt->close();
-        header("Location: register.php"); exit();
+        header("Location: /staymate/pages/register.php"); exit();
     }
 }
-// GET — show the form
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -72,6 +78,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - StayMate</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Merienda&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { font-family: "Poppins", sans-serif; }
         body { background: #f8f9fa; }
@@ -143,8 +150,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
         <?php endif; ?>
 
+        <!-- action uses absolute path to prevent double pages/pages issue -->
         <form action="/staymate/pages/register.php" method="POST">
-
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label class="form-label fw-bold">Full Name</label>
