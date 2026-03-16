@@ -2,13 +2,10 @@
 session_start();
 require_once 'includes/db.php';
 
-// header.php opens DOCTYPE, html, head, body and navbar
 include 'includes/header.php';
 ?>
 
-<!-- Extra fonts needed for this page only (Playfair + DM Sans) -->
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<!-- Swiper CSS -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css"/>
 
 <style>
@@ -230,98 +227,7 @@ include 'includes/header.php';
     </div>
 <?php endif; ?>
 
-<!-- LOGIN MODAL -->
-<div class="modal fade" id="LoginModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <form action="./pages/login.php" method="POST">
-                <div class="modal-header">
-                    <h5 class="modal-title d-flex align-items-center gap-2 display-font">
-                        <i class="bi bi-person-circle fs-4"></i> Sign In
-                    </h5>
-                    <button type="reset" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Email Address</label>
-                        <input type="email" class="form-control shadow-none" name="email" placeholder="you@example.com">
-                    </div>
-                    <div class="mb-4">
-                        <label class="form-label fw-semibold">Password</label>
-                        <input type="password" class="form-control shadow-none" name="password" placeholder="••••••••">
-                    </div>
-                    <div class="d-flex align-items-center justify-content-between">
-                        <button type="submit" class="btn btn-primary-custom">Sign In</button>
-                        <a href="javascript:void(0)" class="text-muted text-decoration-none" style="font-size:0.85rem;">Forgot password?</a>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 
-<!-- REGISTER MODAL -->
-<div class="modal fade" id="registerModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content">
-            <form action="./pages/register.php" method="POST" enctype="multipart/form-data">
-                <div class="modal-header">
-                    <h5 class="modal-title d-flex align-items-center gap-2 display-font">
-                        <i class="bi bi-person-plus fs-4"></i> Create Account
-                    </h5>
-                    <button type="reset" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="alert alert-warning d-flex gap-2 align-items-start py-2 mb-4" style="font-size:0.82rem; border-radius:8px;">
-                        <i class="bi bi-info-circle-fill mt-1"></i>
-                        <span>Your details must match your ID (NID, Passport, Driving Licence) required at check-in.</span>
-                    </div>
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Full Name</label>
-                            <input type="text" class="form-control shadow-none" name="name" placeholder="John Doe" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Email</label>
-                            <input type="email" class="form-control shadow-none" name="email" placeholder="you@example.com" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Phone Number</label>
-                            <input type="number" class="form-control shadow-none" name="phone" placeholder="98XXXXXXXX" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Profile Picture</label>
-                            <input type="file" class="form-control shadow-none" name="picture">
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label fw-semibold">Address</label>
-                            <textarea name="address" class="form-control shadow-none" rows="2" placeholder="Your address..."></textarea>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Pincode</label>
-                            <input type="number" name="pincode" class="form-control shadow-none" placeholder="44600">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Date of Birth</label>
-                            <input type="date" name="dob" class="form-control shadow-none">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Password</label>
-                            <input type="password" name="password" class="form-control shadow-none" placeholder="••••••••" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Confirm Password</label>
-                            <input type="password" name="confirm_password" class="form-control shadow-none" placeholder="••••••••" required>
-                        </div>
-                    </div>
-                    <div class="text-center mt-4">
-                        <button type="submit" name="register" class="btn btn-primary-custom px-5">Create Account</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 
 <!-- HERO CAROUSEL -->
 <div class="hero-wrapper">
@@ -455,7 +361,7 @@ include 'includes/header.php';
                 <div class="room-card">
                     <div class="card-img-wrapper">
                         <!-- kept exactly as your original — uses room1.png -->
-                        <img src="images/rooms/room1.png" alt="<?php echo htmlspecialchars($room['room_type']); ?> Room">
+                        <img src="/staymate/admin/uploads/rooms/<?php echo htmlspecialchars($room['image']); ?>" alt="<?php echo htmlspecialchars($room['room_type']); ?> Room">
                         <span class="hotel-badge" style="background:rgba(46,193,172,0.85);">
                             <i class="bi bi-check-circle me-1"></i> Available
                         </span>

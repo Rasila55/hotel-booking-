@@ -8,7 +8,8 @@ if (isset($_GET['delete'])) {
     // Delete image file from disk too
     $roomToDelete = readOne('rooms', $id);
     if ($roomToDelete && !empty($roomToDelete['image'])) {
-        $imgPath = __DIR__ . '/uploads/rooms/' . $roomToDelete['image'];
+        $imgPath ='/uploads/rooms/' . $roomToDelete['image'];
+        
         if (file_exists($imgPath)) unlink($imgPath);
     }
 
@@ -32,34 +33,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $status      = $_POST['status'];
     $description = trim($_POST['description']);
 
-    //  Image Upload 
-    $image = '';
-    if ($id > 0) {
-        $existing = readOne('rooms', $id);
-        $image    = $existing['image'] ?? '';
+   // Image Upload
+$image = '';
+$existingImage = '';
+
+if ($id > 0) {
+    $existing = readOne('rooms', $id);
+    $existingImage = $existing['image'] ?? '';
+    $image = $existingImage;
+}
+
+if (!empty($_FILES['image']['name'])) {
+
+    $uploadDir = 'uploads/rooms/';
+
+    if (!is_dir($uploadDir)) {
+        mkdir($uploadDir, 0777, true);
     }
 
-    if (!empty($_FILES['image']['name'])) {
-        $upload_dir = __DIR__ . '/uploads/rooms/';
-        if (!is_dir($upload_dir)) mkdir($upload_dir, 0755, true);
+    $fileName = time() . '_' . basename($_FILES['image']['name']);
+    $targetFile = $uploadDir . $fileName;
 
-        $ext     = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
-        $allowed = ['jpg', 'jpeg', 'png', 'webp'];
+    $imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
+    $allowedTypes = ['jpg','jpeg','png','webp'];
 
-        if (in_array($ext, $allowed) && $_FILES['image']['size'] <= 2 * 1024 * 1024) {
-            // Delete old image if replacing
-            if (!empty($image) && file_exists($upload_dir . $image)) {
-                unlink($upload_dir . $image);
+    if (in_array($imageFileType, $allowedTypes)) {
+
+        if ($_FILES['image']['size'] <= 2 * 1024 * 1024) {
+
+            // delete old image when editing
+            if (!empty($existingImage)) {
+                $oldPath = $uploadDir . $existingImage;
+                if (file_exists($oldPath)) {
+                    unlink($oldPath);
+                }
             }
-            $filename = 'room_' . time() . '_' . rand(100, 999) . '.' . $ext;
-            move_uploaded_file($_FILES['image']['tmp_name'], $upload_dir . $filename);
-            $image = $filename;
+
+            if (move_uploaded_file($_FILES['image']['tmp_name'], $targetFile)) {
+                $image = $fileName;
+            }
+
         } else {
-            $_SESSION['error'] = "Image must be JPG, PNG, or WEBP and under 2MB.";
-            header('Location: ' . BASE_PATH . '/rooms' . ($id ? '?edit=' . $id : ''));
+            $_SESSION['error'] = "Image must be under 2MB.";
+            header('Location: ' . BASE_PATH . '/rooms');
             exit();
         }
+
+    } else {
+        $_SESSION['error'] = "Only JPG, JPEG, PNG, WEBP allowed.";
+        header('Location: ' . BASE_PATH . '/rooms');
+        exit();
     }
+}
 
     $data = [
         'hotel_id'    => $hotel_id,
@@ -255,8 +280,9 @@ include 'includes/sidebar.php';
 
             <!-- Show current image when editing -->
             <?php if ($editRoom && !empty($editRoom['image'])): ?>
-                <div style="margin-bottom:10px;">
-                    <img src="/staymate/admin/uploads/rooms/<?php echo htmlspecialchars($editRoom['image']); ?>"
+                    <div style="margin-bottom:10px;">
+                     
+                    <img src="   <?php echo BASE_PATH; ?>/uploads/rooms/<?php echo $editRoom['image']; ?>"
                          style="width:100%; max-height:160px; object-fit:cover; border-radius:8px; border:1px solid #ddd;">
                     <small style="color:#888; display:block; margin-top:4px;">
                         Current image — upload a new one below to replace it
@@ -341,11 +367,12 @@ include 'includes/sidebar.php';
                     <td><?php echo $room['id']; ?></td>
                     <td>
                         <?php if (!empty($room['image'])): ?>
-                            <img src="/staymate/admin/uploads/rooms/<?php echo htmlspecialchars($room['image']); ?>"
+                              
+<img src="<?php echo BASE_PATH;?>/uploads/rooms/<?php echo $room['image']; ?>"
                                  class="room-thumb" alt="Room">
                         <?php else: ?>
                             <div class="room-thumb-placeholder">🛏️</div>
-                        <?php endif; ?>
+                        <?php endif; ?> 
                     </td>
                     <td>
                         <strong><?php echo htmlspecialchars($room['hotel_name']); ?></strong><br>
